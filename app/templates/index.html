@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}UiTM Machang Job Recommender - Home{% endblock %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <section class="py-5 text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-4">Find Your Perfect Job Match</h1>
+            <p class="lead mb-4">Personalized job recommendations based on your skills, qualifications, and career goals.</p>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                {% if current_user.is_authenticated %}
+                    {% if current_user.user_type == 'graduate' %}
+                        <a href="{{ url_for('graduate.dashboard') }}" class="btn btn-primary btn-lg px-4 gap-3">My Dashboard</a>
+                    {% elif current_user.user_type == 'company' %}
+                        <a href="{{ url_for('company.dashboard') }}" class="btn btn-primary btn-lg px-4 gap-3">Company Dashboard</a>
+                    {% endif %}
+                {% else %}
+                    <a href="{{ url_for('auth.register_graduate') }}" class="btn btn-primary btn-lg px-4 gap-3">Get Started</a>
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary btn-lg px-4">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Search Section -->
+    <section class="bg-light py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <h3 class="card-title text-center mb-4">Search Jobs</h3>
+                            <form action="{{ url_for('main.search') }}" method="get">
+                                <div class="input-group">
+                                    <input type="text" name="q" class="form-control form-control-lg" 
+                                           placeholder="Job title, keywords, or company name">
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="fas fa-search"></i> Search
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Jobs Section -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-4">Recent Job Opportunities</h2>
+            
+            {% if recent_jobs %}
+                <div class="row">
+                    {% for job in recent_jobs %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ job.title }}</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">{{ job.company.name }}</h6>
+                                    <p class="card-text">
+                                        <i class="fas fa-map-marker-alt"></i> {{ job.location }}<br>
+                                        <i class="fas fa-tag"></i> {{ job.category }}<br>
+                                        <i class="fas fa-briefcase"></i> {{ job.job_type }}
+                                    </p>
+                                    <p class="card-text">{{ job.description|truncate(100) }}</p>
+                                </div>
+                                <div class="card-footer">
+                                    <a href="{{ url_for('main.job_detail', job_id=job.id) }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('main.jobs') }}" class="btn btn-outline-primary">View All Jobs</a>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    No job listings available at the moment. Please check back later.
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Featured Companies Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-4">Featured Companies</h2>
+            
+            {% if top_companies %}
+                <div class="row">
+                    {% for company in top_companies %}
+                        <div class="col-md-3 mb-4">
+                            <div class="card h-100 text-center">
+                                <div class="card-body">
+                                    {% if company.logo_path %}
+                                        <img src="{{ url_for('static', filename=company.logo_path) }}" 
+                                             alt="{{ company.name }}" class="img-fluid mb-3" style="max-height: 80px;">
+                                    {% else %}
+                                        <div class="company-placeholder mb-3">
+                                            <i class="fas fa-building fa-3x"></i>
+                                        </div>
+                                    {% endif %}
+                                    <h5 class="card-title">{{ company.name }}</h5>
+                                    <p class="card-text text-muted">{{ company.industry }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    No featured companies available at the moment.
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">How It Works</h2>
+            <div class="row text-center">
+                <div class="col-md-4 mb-4">
+                    <div class="p-3">
+                        <div class="feature-icon bg-primary bg-gradient text-white mb-3">
+                            <i class="fas fa-user-plus fa-3x"></i>
+                        </div>
+                        <h3>Create Your Profile</h3>
+                        <p>Register and build your profile with your skills, qualifications, and career preferences.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="p-3">
+                        <div class="feature-icon bg-primary bg-gradient text-white mb-3">
+                            <i class="fas fa-search fa-3x"></i>
+                        </div>
+                        <h3>Get Recommendations</h3>
+                        <p>Our system analyzes your profile and suggests job opportunities that match your requirements.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="p-3">
+                        <div class="feature-icon bg-primary bg-gradient text-white mb-3">
+                            <i class="fas fa-check-circle fa-3x"></i>
+                        </div>
+                        <h3>Apply & Get Hired</h3>
+                        <p>Apply directly through our platform and track your application status in real-time.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5">Success Stories</h2>
+            <div id="testimonialsCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <div class="row justify-content-center">
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <p class="lead">"The personalized recommendations helped me find a job that perfectly matched my skills and career goals. I'm now working at my dream company!"</p>
+                                        <p class="fw-bold">- Ahmad, Computer Science Graduate</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <div class="row justify-content-center">
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <p class="lead">"As a business major, I wasn't sure which career path to pursue. The Job Recommender System showed me opportunities I hadn't considered before."</p>
+                                        <p class="fw-bold">- Sarah, Business Administration Graduate</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <div class="row justify-content-center">
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <p class="lead">"The system's recommendations were spot on! I found and applied for a position that matched my experience and got hired within two weeks."</p>
+                                        <p class="fw-bold">- Mei Ling, Accounting Graduate</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Post Job - UiTM Machang Job Recommender{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Post a New Job</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('company.create_job') }}">
+                        <!-- Job Basic Information -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2">Basic Information</h5>
+                            
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Job Title <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="title" name="title" required>
+                                <div class="form-text">Be specific with the job title to attract relevant candidates.</div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="category" class="form-label">Job Category <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="category" name="category" required>
+                                        <option value="" selected disabled>Select Category</option>
+                                        <option value="Technology">Technology</option>
+                                        <option value="Finance">Finance</option>
+                                        <option value="Healthcare">Healthcare</option>
+                                        <option value="Education">Education</option>
+                                        <option value="Manufacturing">Manufacturing</option>
+                                        <option value="Retail">Retail</option>
+                                        <option value="Hospitality">Hospitality</option>
+                                        <option value="Media">Media</option>
+                                        <option value="Engineering">Engineering</option>
+                                        <option value="Sales">Sales</option>
+                                        <option value="Marketing">Marketing</option>
+                                        <option value="Customer Service">Customer Service</option>
+                                        <option value="Administrative">Administrative</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="subcategory" class="form-label">Subcategory</label>
+                                    <input type="text" class="form-control" id="subcategory" name="subcategory">
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="role" class="form-label">Role Type <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="role" name="role" required>
+                                        <option value="" selected disabled>Select Role</option>
+                                        <option value="Developer">Developer</option>
+                                        <option value="Designer">Designer</option>
+                                        <option value="Manager">Manager</option>
+                                        <option value="Analyst">Analyst</option>
+                                        <option value="Engineer">Engineer</option>
+                                        <option value="Specialist">Specialist</option>
+                                        <option value="Assistant">Assistant</option>
+                                        <option value="Executive">Executive</option>
+                                        <option value="Director">Director</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="job_type" class="form-label">Employment Type <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="job_type" name="job_type" required>
+                                        <option value="" selected disabled>Select Type</option>
+                                        <option value="Full-time">Full-time</option>
+                                        <option value="Part-time">Part-time</option>
+                                        <option value="Contract">Contract</option>
+                                        <option value="Internship">Internship</option>
+                                        <option value="Remote">Remote</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="location" class="form-label">Job Location <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="location" name="location" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Salary Range</label>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <input type="number" class="form-control" id="salary_min" name="salary_min" placeholder="Min (RM)">
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="number" class="form-control" id="salary_max" name="salary_max" placeholder="Max (RM)">
+                                    </div>
+                                </div>
+                                <div class="form-text">Enter the salary range in RM</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Job Description -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2">Job Description</h5>
+                            
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Job Description <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="description" name="description" rows="6" required></textarea>
+                                <div class="form-text">Provide a detailed description of the job responsibilities and duties.</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="qualification" class="form-label">Qualifications <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="qualification" name="qualification" rows="4" required></textarea>
+                                <div class="form-text">Specify the required qualifications, education, and experience.</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="criteria" class="form-label">Additional Criteria</label>
+                                <textarea class="form-control" id="criteria" name="criteria" rows="4"></textarea>
+                                <div class="form-text">Add any additional requirements or criteria for the job.</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Additional Settings -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2">Additional Settings</h5>
+                            
+                            <div class="mb-3">
+                                <label for="closing_date" class="form-label">Closing Date</label>
+                                <input type="date" class="form-control" id="closing_date" name="closing_date">
+                                <div class="form-text">Leave empty for no closing date.</div>
+                            </div>
+                            
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" checked>
+                                <label class="form-check-label" for="is_active">
+                                    Make this job posting active immediately
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Post Job</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

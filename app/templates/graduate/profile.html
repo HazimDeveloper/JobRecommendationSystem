@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Graduate Profile - UiTM Machang Job Recommender{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5">Your Profile</h1>
+            <p class="lead">Keep your profile updated to get the best job recommendations</p>
+        </div>
+        <div class="col-md-4 d-flex align-items-center justify-content-end">
+            <a href="{{ url_for('graduate.dashboard') }}" class="btn btn-outline-primary">
+                <i class="fas fa-tachometer-alt me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <!-- Profile sidebar -->
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    <div class="profile-icon mb-3">
+                        <i class="fas fa-user-graduate fa-5x text-primary"></i>
+                    </div>
+                    <h5 class="card-title">{{ graduate.first_name }} {{ graduate.last_name }}</h5>
+                    <p class="text-muted">{{ graduate.email }}</p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Resume
+                        {% if graduate.resume_path %}
+                            <span class="badge bg-success rounded-pill"><i class="fas fa-check"></i></span>
+                        {% else %}
+                            <span class="badge bg-danger rounded-pill"><i class="fas fa-times"></i></span>
+                        {% endif %}
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Skills
+                        {% if graduate.skills %}
+                            <span class="badge bg-success rounded-pill"><i class="fas fa-check"></i></span>
+                        {% else %}
+                            <span class="badge bg-danger rounded-pill"><i class="fas fa-times"></i></span>
+                        {% endif %}
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Experience
+                        {% if graduate.experience %}
+                            <span class="badge bg-success rounded-pill"><i class="fas fa-check"></i></span>
+                        {% else %}
+                            <span class="badge bg-danger rounded-pill"><i class="fas fa-times"></i></span>
+                        {% endif %}
+                    </li>
+                </ul>
+                <div class="card-body">
+                    <a href="{{ url_for('graduate.recommendations') }}" class="btn btn-outline-primary w-100 mb-2">
+                        <i class="fas fa-lightbulb me-2"></i>View Recommendations
+                    </a>
+                    <a href="{{ url_for('graduate.applications') }}" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-clipboard-list me-2"></i>View Applications
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <!-- Profile form -->
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Graduate Profile</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('graduate.profile') }}" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="first_name" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" value="{{ graduate.first_name }}" required>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="last_name" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" value="{{ graduate.last_name }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="skills" class="form-label">Skills</label>
+                            <textarea class="form-control" id="skills" name="skills" rows="3" placeholder="List your skills, separated by commas (e.g., Python, Data Analysis, Communication)">{{ graduate.skills }}</textarea>
+                            <div class="form-text">List all relevant skills that showcase your capabilities to potential employers.</div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="salary_preference" class="form-label">Salary Preference</label>
+                                <input type="text" class="form-control" id="salary_preference" name="salary_preference" value="{{ graduate.salary_preference }}" placeholder="e.g., RM 3,000 - RM 5,000">
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Salary Range</label>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <input type="number" class="form-control" id="salary_min" name="salary_min" value="{{ graduate.salary_min }}" placeholder="Min (RM)">
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="number" class="form-control" id="salary_max" name="salary_max" value="{{ graduate.salary_max }}" placeholder="Max (RM)">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="location_preference" class="form-label">Location Preference</label>
+                                <input type="text" class="form-control" id="location_preference" name="location_preference" value="{{ graduate.location_preference }}" placeholder="e.g., Kuala Lumpur, Remote">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="experience" class="form-label">Experience</label>
+                            <textarea class="form-control" id="experience" name="experience" rows="4" placeholder="Describe your previous work experience, internships, or projects">{{ graduate.experience }}</textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="resume" class="form-label">Resume</label>
+                            <input type="file" class="form-control" id="resume" name="resume" accept=".pdf,.doc,.docx">
+                            {% if graduate.resume_path %}
+                                <div class="form-text">
+                                    Current resume: <a href="{{ url_for('static', filename=graduate.resume_path) }}" target="_blank">View Resume</a>
+                                </div>
+                            {% else %}
+                                <div class="form-text">Upload your resume in PDF or Word format.</div>
+                            {% endif %}
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" value="{{ graduate.email }}" disabled>
+                            <div class="form-text">Email address cannot be changed. Contact support if you need to update it.</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Update Profile</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Change Password -->
+            <div class="card shadow mt-4">
+                <div class="card-header bg-secondary text-white">
+                    <h4 class="mb-0">Change Password</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('graduate.change_password') }}">
+                        <input type="hidden" name="form_type" value="password_change">
+                        <div class="mb-3">
+                            <label for="current_password" class="form-label">Current Password</label>
+                            <input type="password" class="form-control" id="current_password" name="current_password" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="new_password" class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="new_password" name="new_password" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-secondary">Change Password</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const passwordField = document.getElementById('new_password');
+        const confirmPasswordField = document.getElementById('confirm_password');
+        
+        function validatePassword() {
+            if (passwordField.value !== confirmPasswordField.value) {
+                confirmPasswordField.setCustomValidity("Passwords don't match");
+            } else {
+                confirmPasswordField.setCustomValidity('');
+            }
+        }
+        
+        if (passwordField && confirmPasswordField) {
+            passwordField.addEventListener('change', validatePassword);
+            confirmPasswordField.addEventListener('keyup', validatePassword);
+        }
+    });
+</script>
+{% endblock %}

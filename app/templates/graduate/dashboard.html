@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Graduate Dashboard - UiTM Machang Job Recommender{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Dashboard Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="display-5">Graduate Dashboard</h1>
+            <p class="lead">Welcome back, {{ graduate.first_name }} {{ graduate.last_name }}</p>
+        </div>
+        <div>
+            <a href="{{ url_for('graduate.profile') }}" class="btn btn-primary">
+                <i class="fas fa-user-edit me-2"></i>Update Profile
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body text-center">
+                    <h3 class="card-title">{{ recommendations|length if recommendations else 0 }}</h3>
+                    <p class="card-text">Job Recommendations</p>
+                    <i class="fas fa-lightbulb fa-3x opacity-50"></i>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center">
+                    <a href="{{ url_for('graduate.recommendations') }}" class="text-white">View All <i class="fas fa-arrow-right ms-1"></i></a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body text-center">
+                    <h3 class="card-title">{{ pending_count }}</h3>
+                    <p class="card-text">Pending Applications</p>
+                    <i class="fas fa-hourglass-half fa-3x opacity-50"></i>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center">
+                    <a href="{{ url_for('graduate.applications', status='Pending') }}" class="text-white">View All <i class="fas fa-arrow-right ms-1"></i></a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body text-center">
+                    <h3 class="card-title">{{ accepted_count }}</h3>
+                    <p class="card-text">Accepted Applications</p>
+                    <i class="fas fa-check-circle fa-3x opacity-50"></i>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center">
+                    <a href="{{ url_for('graduate.applications', status='Accepted') }}" class="text-white">View All <i class="fas fa-arrow-right ms-1"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommendations Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recommended Jobs For You</h5>
+                <a href="{{ url_for('graduate.recommendations') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if recommendations %}
+                <div class="row">
+                    {% for recommendation in recommendations %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <h5 class="card-title mb-0">{{ recommendation.job_posting.title }}</h5>
+                                        <span class="badge bg-primary">{{ (recommendation.match_score * 100)|round }}% Match</span>
+                                    </div>
+                                    <h6 class="card-subtitle mb-2 text-muted">{{ recommendation.job_posting.company.name }}</h6>
+                                    <p class="card-text mb-1">
+                                        <i class="fas fa-map-marker-alt text-secondary me-2"></i>{{ recommendation.job_posting.location }}
+                                    </p>
+                                    <p class="card-text">
+                                        <i class="fas fa-briefcase text-secondary me-2"></i>{{ recommendation.job_posting.job_type }}
+                                    </p>
+                                    <div class="d-grid mt-3">
+                                        <a href="{{ url_for('main.job_detail', job_id=recommendation.job_posting.id) }}" class="btn btn-outline-primary">View Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>No job recommendations available yet. 
+                    <a href="{{ url_for('graduate.profile') }}" class="alert-link">Update your profile</a> to get personalized job recommendations.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Applications Section -->
+    <div class="card shadow">
+        <div class="card-header bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Applications</h5>
+                <a href="{{ url_for('graduate.applications') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if recent_applications %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Job Title</th>
+                                <th>Company</th>
+                                <th>Applied On</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for application in recent_applications %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('main.job_detail', job_id=application.job_id) }}" class="text-decoration-none fw-bold">
+                                            {{ application.job_posting.title }}
+                                        </a>
+                                    </td>
+                                    <td>{{ application.job_posting.company.name }}</td>
+                                    <td>{{ application.application_date.strftime('%b %d, %Y') }}</td>
+                                    <td>
+                                        {% if application.status == 'Pending' %}
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                        {% elif application.status == 'Accepted' %}
+                                            <span class="badge bg-success">Accepted</span>
+                                        {% elif application.status == 'Rejected' %}
+                                            <span class="badge bg-danger">Rejected</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('main.job_detail', job_id=application.job_id) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>You haven't applied to any jobs yet. 
+                    <a href="{{ url_for('main.jobs') }}" class="alert-link">Browse jobs</a> to find opportunities.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

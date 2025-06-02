@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results for "{{ query }}" - UiTM Machang Job Recommender{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5">Search Results</h1>
+            <p class="lead">
+                Found {{ jobs|length }} result{% if jobs|length != 1 %}s{% endif %} for "{{ query }}"
+            </p>
+        </div>
+        <div class="col-md-4 d-flex align-items-center justify-content-end">
+            <form method="GET" action="{{ url_for('main.search') }}" class="d-flex">
+                <input type="text" name="q" class="form-control me-2" placeholder="Search jobs..." value="{{ query }}">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Search Results -->
+    <div class="row">
+        {% if jobs %}
+            {% for job in jobs %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm job-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h5 class="card-title mb-0">{{ job.title }}</h5>
+                                {% if job.salary %}
+                                    <span class="badge bg-success">{{ job.salary }}</span>
+                                {% endif %}
+                            </div>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ job.company.name }}</h6>
+                            <p class="card-text mb-1">
+                                <i class="fas fa-map-marker-alt text-secondary me-2"></i>{{ job.location }}
+                            </p>
+                            <p class="card-text mb-1">
+                                <i class="fas fa-tag text-secondary me-2"></i>{{ job.category }}
+                            </p>
+                            <p class="card-text mb-3">
+                                <i class="fas fa-briefcase text-secondary me-2"></i>{{ job.job_type }}
+                            </p>
+                            <p class="card-text text-truncate">{{ job.description|truncate(150) }}</p>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <small class="text-muted">Posted {{ job.posting_date.strftime('%b %d, %Y') }}</small>
+                                <a href="{{ url_for('main.job_detail', job_id=job.id) }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>No job listings found for "{{ query }}". Please try a different search term.
+                </div>
+                
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Search Tips</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Try using more general keywords</li>
+                            <li class="list-group-item">Check spelling of your search terms</li>
+                            <li class="list-group-item">Try searching by job title, skills or company name</li>
+                            <li class="list-group-item">Browse all available jobs by category using our <a href="{{ url_for('main.jobs') }}">Jobs</a> page</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Return to all jobs -->
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <a href="{{ url_for('main.jobs') }}" class="btn btn-outline-primary">
+                <i class="fas fa-list me-2"></i>View All Jobs
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

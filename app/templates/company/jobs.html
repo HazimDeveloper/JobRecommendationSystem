@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Jobs - UiTM Machang Job Recommender{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="display-5">Manage Jobs</h1>
+            <p class="lead">View and manage all your job postings</p>
+        </div>
+        <div>
+            <a href="{{ url_for('company.create_job') }}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-2"></i>Post New Job
+            </a>
+        </div>
+    </div>
+    
+    <!-- Job Status Tabs -->
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+            <a class="nav-link {% if not request.args.get('status') or request.args.get('status') == 'all' %}active{% endif %}" href="{{ url_for('company.jobs') }}">All Jobs</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.args.get('status') == 'active' %}active{% endif %}" href="{{ url_for('company.jobs', status='active') }}">Active Jobs</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.args.get('status') == 'inactive' %}active{% endif %}" href="{{ url_for('company.jobs', status='inactive') }}">Inactive Jobs</a>
+        </li>
+    </ul>
+    
+    <!-- Job Listings -->
+    <div class="card shadow">
+        <div class="card-body">
+            {% if jobs %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Location</th>
+                                <th>Category</th>
+                                <th>Posted On</th>
+                                <th>Status</th>
+                                <th>Applications</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for job in jobs %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('main.job_detail', job_id=job.id) }}" class="text-decoration-none fw-bold">
+                                            {{ job.title }}
+                                        </a>
+                                    </td>
+                                    <td>{{ job.location }}</td>
+                                    <td>{{ job.category }}</td>
+                                    <td>{{ job.posting_date.strftime('%b %d, %Y') }}</td>
+                                    <td>
+                                        {% if job.is_active %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('company.applications', job_id=job.id) }}" class="badge bg-primary text-decoration-none">
+                                            {{ job.applications|length }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{{ url_for('company.edit_job', job_id=job.id) }}" class="btn btn-outline-primary" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{{ url_for('company.toggle_job', job_id=job.id) }}" class="btn btn-outline-secondary toggle-job-btn" title="Toggle Status">
+                                                {% if job.is_active %}
+                                                    <i class="fas fa-toggle-off"></i>
+                                                {% else %}
+                                                    <i class="fas fa-toggle-on"></i>
+                                                {% endif %}
+                                            </a>
+                                            <a href="{{ url_for('main.job_detail', job_id=job.id) }}" class="btn btn-outline-info" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>No job postings found.
+                    <a href="{{ url_for('company.create_job') }}" class="alert-link">Create a new job posting</a> to attract candidates.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Confirm toggle job status
+        const toggleButtons = document.querySelectorAll('.toggle-job-btn');
+        
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const isActive = this.querySelector('.fa-toggle-off') !== null;
+                const action = isActive ? 'deactivate' : 'activate';
+                
+                if (confirm(`Are you sure you want to ${action} this job posting?`)) {
+                    window.location.href = this.getAttribute('href');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Job Listings - UiTM Machang Job Recommender{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5">Job Listings</h1>
+            <p class="lead">Find the perfect job opportunity that matches your skills and career goals.</p>
+        </div>
+        <div class="col-md-4 d-flex align-items-center justify-content-end">
+            <form method="GET" action="{{ url_for('main.search') }}" class="d-flex">
+                <input type="text" name="q" class="form-control me-2" placeholder="Search jobs...">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Filters section -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Filters</h5>
+        </div>
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('main.jobs') }}">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="category" class="form-label">Category</label>
+                        <select name="category" id="category" class="form-select">
+                            <option value="">All Categories</option>
+                            {% for category in categories %}
+                                <option value="{{ category[0] }}" {% if request.args.get('category') == category[0] %}selected{% endif %}>
+                                    {{ category[0] }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="location" class="form-label">Location</label>
+                        <select name="location" id="location" class="form-select">
+                            <option value="">All Locations</option>
+                            {% for location in locations %}
+                                <option value="{{ location[0] }}" {% if request.args.get('location') == location[0] %}selected{% endif %}>
+                                    {{ location[0] }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="type" class="form-label">Job Type</label>
+                        <select name="type" id="type" class="form-select">
+                            <option value="">All Types</option>
+                            {% for job_type in job_types %}
+                                <option value="{{ job_type[0] }}" {% if request.args.get('type') == job_type[0] %}selected{% endif %}>
+                                    {{ job_type[0] }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
+                    <a href="{{ url_for('main.jobs') }}" class="btn btn-outline-secondary">Reset Filters</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Job Listings -->
+    <div class="row">
+        {% if jobs %}
+            {% if jobs.items %}
+                {% for job in jobs.items %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 shadow-sm job-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h5 class="card-title mb-0">{{ job.title }}</h5>
+                                    {% if job.salary %}
+                                        <span class="badge bg-success">{{ job.salary }}</span>
+                                    {% endif %}
+                                </div>
+                                <h6 class="card-subtitle mb-2 text-muted">{{ job.company.name }}</h6>
+                                <p class="card-text mb-1">
+                                    <i class="fas fa-map-marker-alt text-secondary me-2"></i>{{ job.location }}
+                                </p>
+                                <p class="card-text mb-1">
+                                    <i class="fas fa-tag text-secondary me-2"></i>{{ job.category }}
+                                </p>
+                                <p class="card-text mb-3">
+                                    <i class="fas fa-briefcase text-secondary me-2"></i>{{ job.job_type }}
+                                </p>
+                                <p class="card-text text-truncate">{{ job.description|truncate(150) }}</p>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <small class="text-muted">Posted {{ job.posting_date.strftime('%b %d, %Y') }}</small>
+                                    <a href="{{ url_for('main.job_detail', job_id=job.id) }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <!-- Pagination -->
+                <div class="col-12">
+                    <nav aria-label="Job listing pagination">
+                        <ul class="pagination justify-content-center">
+                            {% if jobs.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('main.jobs', page=jobs.prev_num) }}">Previous</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#">Previous</a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for page_num in range(1, jobs.pages + 1) %}
+                                {% if page_num == jobs.page %}
+                                    <li class="page-item active">
+                                        <a class="page-link" href="{{ url_for('main.jobs', page=page_num) }}">{{ page_num }}</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('main.jobs', page=page_num) }}">{{ page_num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if jobs.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('main.jobs', page=jobs.next_num) }}">Next</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#">Next</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>No job listings found. Please try different filter criteria or check back later.
+                    </div>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>No job listings found. Please try different filter criteria or check back later.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

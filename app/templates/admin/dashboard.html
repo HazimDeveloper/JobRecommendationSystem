@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - UiTM Machang Job Recommender{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Dashboard Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="display-5">Admin Dashboard</h1>
+            <p class="lead">System Overview</p>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Graduates</h5>
+                    <h2 class="display-4">{{ graduate_count }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Companies</h5>
+                    <h2 class="display-4">{{ company_count }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Job Postings</h5>
+                    <h2 class="display-4">{{ job_count }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Applications</h5>
+                    <h2 class="display-4">{{ application_count }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activities -->
+    <div class="row">
+        <!-- Recent Job Postings -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Recent Job Postings</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_jobs %}
+                        <div class="list-group list-group-flush">
+                            {% for job in recent_jobs %}
+                                <a href="{{ url_for('admin.job_detail', job_id=job.id) }}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ job.title }}</h6>
+                                        <small>{{ job.posting_date.strftime('%Y-%m-%d') }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ job.company.name }}</p>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">No recent job postings</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Applications -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Recent Applications</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_applications %}
+                        <div class="list-group list-group-flush">
+                            {% for application in recent_applications %}
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ application.graduate.first_name }} {{ application.graduate.last_name }}</h6>
+                                        <small>{{ application.application_date.strftime('%Y-%m-%d') }}</small>
+                                    </div>
+                                    <p class="mb-1">Applied for: {{ application.job_posting.title }}</p>
+                                    <small class="text-{{ application.status|lower }}">Status: {{ application.status }}</small>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">No recent applications</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Evaluation Chart -->
+    {% if sus_chart %}
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">System Usability Scale (SUS) Evaluation</h5>
+                </div>
+                <div class="card-body">
+                    <img src="data:image/png;base64,{{ sus_chart }}" class="img-fluid" alt="SUS Evaluation Chart">
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

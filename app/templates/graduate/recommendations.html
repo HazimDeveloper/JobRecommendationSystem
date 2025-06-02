@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Job Recommendations - UiTM Machang Job Recommender{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5">Your Job Recommendations</h1>
+            <p class="lead">Personalized job opportunities based on your skills and preferences</p>
+        </div>
+        <div class="col-md-4 d-flex align-items-center justify-content-end">
+            <a href="{{ url_for('graduate.profile') }}" class="btn btn-outline-primary">
+                <i class="fas fa-user-edit me-2"></i>Update Profile
+            </a>
+        </div>
+    </div>
+
+    <!-- Recommendations -->
+    <div class="row">
+        {% if recommendations %}
+            {% for recommendation in recommendations %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <h5 class="card-title mb-0">{{ recommendation.job_posting.title }}</h5>
+                                <span class="badge bg-primary">{{ (recommendation.match_score * 100)|round }}% Match</span>
+                            </div>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ recommendation.job_posting.company.name }}</h6>
+                            <p class="card-text mb-1">
+                                <i class="fas fa-map-marker-alt text-secondary me-2"></i>{{ recommendation.job_posting.location }}
+                            </p>
+                            <p class="card-text mb-1">
+                                <i class="fas fa-tag text-secondary me-2"></i>{{ recommendation.job_posting.category }}
+                            </p>
+                            <p class="card-text mb-3">
+                                <i class="fas fa-briefcase text-secondary me-2"></i>{{ recommendation.job_posting.job_type }}
+                            </p>
+                            <p class="card-text text-truncate">{{ recommendation.job_posting.description|truncate(150) }}</p>
+                        </div>
+                        <div class="card-footer bg-transparent d-flex justify-content-between">
+                            <small class="text-muted">Posted {{ recommendation.job_posting.posting_date.strftime('%b %d, %Y') }}</small>
+                            <div>
+                                <a href="{{ url_for('main.job_detail', job_id=recommendation.job_posting.id) }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                <a href="{{ url_for('graduate.apply_job', job_id=recommendation.job_posting.id) }}" class="btn btn-sm btn-success">Apply</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+            <!-- Regenerate Recommendations Button -->
+            <div class="col-12 mt-3 text-center">
+                <form method="POST" action="{{ url_for('graduate.regenerate_recommendations') }}">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sync-alt me-2"></i>Refresh Recommendations
+                    </button>
+                </form>
+            </div>
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <h4 class="alert-heading"><i class="fas fa-info-circle me-2"></i>No recommendations yet!</h4>
+                    <p>We don't have enough information to provide personalized job recommendations.</p>
+                    <hr>
+                    <p class="mb-0">Please <a href="{{ url_for('graduate.profile') }}" class="alert-link">update your profile</a> with your skills, experience, and preferences to get personalized job recommendations.</p>
+                </div>
+                
+                <!-- Browse Jobs Instead -->
+                <div class="text-center mt-4">
+                    <p>In the meantime, you can browse all available job listings:</p>
+                    <a href="{{ url_for('main.jobs') }}" class="btn btn-primary">
+                        <i class="fas fa-search me-2"></i>Browse All Jobs
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Why These Recommendations Section -->
+    <div class="card mt-5">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">How Recommendations Work</h5>
+        </div>
+        <div class="card-body">
+            <p>Our content-based filtering algorithm analyzes your profile and matches it with available job opportunities based on:</p>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="d-flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-tools fa-2x text-primary me-3"></i>
+                        </div>
+                        <div>
+                            <h5>Skills Match</h5>
+                            <p class="small">Jobs requiring skills similar to those you've listed in your profile.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="d-flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-map-marked-alt fa-2x text-primary me-3"></i>
+                        </div>
+                        <div>
+                            <h5>Location Preference</h5>
+                            <p class="small">Jobs in your preferred location or geographic area.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="d-flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-chart-line fa-2x text-primary me-3"></i>
+                        </div>
+                        <div>
+                            <h5>Career Path</h5>
+                            <p class="small">Jobs that align with your experience level and career aspirations.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="mb-0">The more information you provide in your profile, the more accurate your recommendations will be!</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

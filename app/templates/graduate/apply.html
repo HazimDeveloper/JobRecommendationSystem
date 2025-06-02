@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Apply for {{ job.title }} - UiTM Machang Job Recommender{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Breadcrumb navigation -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('graduate.dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('main.job_detail', job_id=job.id) }}">Job Details</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Apply</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Apply for {{ job.title }}</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Job Summary -->
+                    <div class="mb-4">
+                        <h5>Job Summary</h5>
+                        <div class="card bg-light mb-3">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">{{ job.company.name }}</h6>
+                                <p class="card-text mb-1">
+                                    <i class="fas fa-map-marker-alt text-secondary me-2"></i>{{ job.location }}
+                                </p>
+                                <p class="card-text mb-1">
+                                    <i class="fas fa-tag text-secondary me-2"></i>{{ job.category }}
+                                </p>
+                                <p class="card-text">
+                                    <i class="fas fa-briefcase text-secondary me-2"></i>{{ job.job_type }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Application Form -->
+                    <form method="POST" action="{{ url_for('graduate.apply_job', job_id=job.id) }}">
+                        <!-- Candidate Information -->
+                        <div class="mb-4">
+                            <h5>Your Information</h5>
+                            <div class="card bg-light mb-3">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p class="mb-1"><strong>Name:</strong> {{ graduate.first_name }} {{ graduate.last_name }}</p>
+                                            <p class="mb-1"><strong>Email:</strong> {{ graduate.email }}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p class="mb-1"><strong>Resume:</strong> 
+                                                {% if graduate.resume_path %}
+                                                    <span class="text-success"><i class="fas fa-check-circle me-1"></i>Uploaded</span>
+                                                {% else %}
+                                                    <span class="text-danger"><i class="fas fa-times-circle me-1"></i>Not uploaded</span>
+                                                {% endif %}
+                                            </p>
+                                            <p class="mb-0">
+                                                {% if graduate.resume_path %}
+                                                    <a href="{{ url_for('static', filename=graduate.resume_path) }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                                        <i class="fas fa-file-pdf me-1"></i>View Resume
+                                                    </a>
+                                                {% else %}
+                                                    <a href="{{ url_for('graduate.profile') }}" class="btn btn-sm btn-outline-danger">
+                                                        <i class="fas fa-upload me-1"></i>Upload Resume
+                                                    </a>
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Application Note -->
+                        <div class="mb-4">
+                            <div class="alert alert-info">
+                                <h5 class="alert-heading"><i class="fas fa-info-circle me-2"></i>Application Process</h5>
+                                <p>By clicking the "Submit Application" button, your profile and resume will be sent to {{ job.company.name }} for review.</p>
+                                <p class="mb-0">You can track the status of your application in your dashboard.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Application Actions -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('main.job_detail', job_id=job.id) }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Job Details
+                            </a>
+                            
+                            {% if not graduate.resume_path %}
+                                <div>
+                                    <a href="{{ url_for('graduate.profile') }}" class="btn btn-warning me-2">
+                                        <i class="fas fa-upload me-2"></i>Upload Resume First
+                                    </a>
+                                    <button type="submit" class="btn btn-primary" disabled>
+                                        <i class="fas fa-paper-plane me-2"></i>Submit Application
+                                    </button>
+                                </div>
+                            {% else %}
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-2"></i>Submit Application
+                                </button>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

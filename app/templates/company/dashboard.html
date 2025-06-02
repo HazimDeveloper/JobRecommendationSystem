@@ -1,0 +1,235 @@
+
+{% extends "base.html" %}
+
+{% block title %}Company Dashboard - UiTM Machang Job Recommender{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Company Dashboard Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="display-5">Company Dashboard</h1>
+            <p class="lead">Welcome back, {{ company.name }}</p>
+        </div>
+        <div>
+            <a href="{{ url_for('company.create_job') }}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-2"></i>Post New Job
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <!-- Card sections remain unchanged -->
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body text-center">
+                    <h3 class="card-title">{{ active_job_count }}</h3>
+                    <p class="card-text">Active Jobs</p>
+                    <i class="fas fa-briefcase fa-3x opacity-50"></i>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center">
+                    <a href="{{ url_for('company.jobs', status='active') }}" class="text-white">View All <i class="fas fa-arrow-right ms-1"></i></a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-secondary text-white h-100">
+                <div class="card-body text-center">
+                    <h3 class="card-title">{{ inactive_job_count }}</h3>
+                    <p class="card-text">Inactive Jobs</p>
+                    <i class="fas fa-folder fa-3x opacity-50"></i>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center">
+                    <a href="{{ url_for('company.jobs', status='inactive') }}" class="text-white">View All <i class="fas fa-arrow-right ms-1"></i></a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body text-center">
+                    <h3 class="card-title">{{ pending_application_count }}</h3>
+                    <p class="card-text">Pending Applications</p>
+                    <i class="fas fa-hourglass-half fa-3x opacity-50"></i>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center">
+                    <a href="{{ url_for('company.applications', status='Pending') }}" class="text-white">View All <i class="fas fa-arrow-right ms-1"></i></a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body text-center">
+                    <h3 class="card-title">{{ profile_completion }}%</h3>
+                    <p class="card-text">Profile Completion</p>
+                    <i class="fas fa-user-check fa-3x opacity-50"></i>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center">
+                    <a href="{{ url_for('company.profile') }}" class="text-white">Update Profile <i class="fas fa-arrow-right ms-1"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Jobs Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Active Job Listings</h5>
+                <a href="{{ url_for('company.jobs') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if active_jobs %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Location</th>
+                                <th>Category</th>
+                                <th>Posted On</th>
+                                <th>Applications</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for job in active_jobs %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('main.job_detail', job_id=job.id) }}" class="text-decoration-none fw-bold">
+                                            {{ job.title }}
+                                        </a>
+                                    </td>
+                                    <td>{{ job.location }}</td>
+                                    <td>{{ job.category }}</td>
+                                    <td>{{ job.posting_date.strftime('%b %d, %Y') }}</td>
+                                    <td>
+                                        <a href="{{ url_for('company.applications', job_id=job.id) }}" class="badge bg-primary text-decoration-none">
+                                            {{ job.applications|length }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{{ url_for('company.edit_job', job_id=job.id) }}" class="btn btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{{ url_for('company.toggle_job', job_id=job.id) }}" class="btn btn-outline-secondary toggle-job-btn">
+                                                <i class="fas fa-power-off"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>You don't have any active job postings.
+                    <a href="{{ url_for('company.create_job') }}" class="alert-link">Create a new job posting</a> to attract candidates.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Applications Section -->
+    <div class="card shadow">
+        <div class="card-header bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Applications</h5>
+                <a href="{{ url_for('company.applications') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if recent_applications %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Applicant</th>
+                                <th>Job Title</th>
+                                <th>Applied On</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for application, job in recent_applications %}
+                                <tr>
+                                    <td>{{ application.graduate.first_name }} {{ application.graduate.last_name }}</td>
+                                    <td>
+                                        <a href="{{ url_for('main.job_detail', job_id=job.id) }}" class="text-decoration-none">
+                                            {{ job.title }}
+                                        </a>
+                                    </td>
+                                    <td>{{ application.application_date.strftime('%b %d, %Y') }}</td>
+                                    <td>
+                                        {% if application.status == 'Pending' %}
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                        {% elif application.status == 'Accepted' %}
+                                            <span class="badge bg-success">Accepted</span>
+                                        {% elif application.status == 'Rejected' %}
+                                            <span class="badge bg-danger">Rejected</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{{ url_for('company.application_detail', application_id=application.id) }}" class="btn btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            {% if application.status == 'Pending' %}
+                                                <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#updateStatusModal{{ application.id }}">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <!-- Status Update Modal -->
+                                        {% if application.status == 'Pending' %}
+                                            <div class="modal fade" id="updateStatusModal{{ application.id }}" tabindex="-1" aria-labelledby="updateStatusModalLabel{{ application.id }}" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="updateStatusModalLabel{{ application.id }}">Update Application Status</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>Update the application status for {{ application.graduate.first_name }} {{ application.graduate.last_name }} for the position of {{ job.title }}.</p>
+                                                            <form id="statusForm{{ application.id }}" method="POST" action="{{ url_for('company.update_application', application_id=application.id) }}" class="status-update-form">
+                                                                <div class="mb-3">
+                                                                    <label for="status{{ application.id }}" class="form-label">Status</label>
+                                                                    <select class="form-select" id="status{{ application.id }}" name="status">
+                                                                        <option value="Pending" {% if application.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                                                        <option value="Accepted">Accepted</option>
+                                                                        <option value="Rejected">Rejected</option>
+                                                                    </select>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                            <button type="submit" form="statusForm{{ application.id }}" class="btn btn-primary">Update Status</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>No applications received yet.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

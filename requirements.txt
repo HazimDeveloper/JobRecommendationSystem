@@ -1,0 +1,33 @@
+# Core Flask packages
+Flask==2.3.3
+Flask-Login==0.6.2
+Flask-SQLAlchemy==3.1.1
+Flask-Migrate==4.0.5
+Flask-Bcrypt==1.0.1
+Flask-WTF==1.2.1
+Flask-Mail==0.9.1
+Werkzeug==2.3.7
+SQLAlchemy==2.0.23
+email-validator==2.1.0.post1
+Jinja2==3.1.2
+WTForms==3.1.1
+
+# Database
+PyMySQL==1.1.0
+cryptography==41.0.5
+
+# Recommendation system
+scikit-learn==1.3.2
+numpy==1.26.1
+pandas==2.1.2
+nltk==3.8.1
+scipy==1.11.3
+
+# Visualization
+matplotlib==3.8.1
+seaborn==0.13.0
+
+# Utilities
+python-dotenv==1.0.0
+Pillow==10.1.0
+tqdm==4.66.1
